@@ -1,25 +1,29 @@
+library('R.utils')
+library('tidyverse')
+library('magrittr')
 
 ## RAW WIG FOR COMPARISON ------------------------------------------------------
-#raw_wig <- read_lines('normal.wig')
-#raw_wig_id <- raw_wig %>% startsWith('fixedStep') %>% which
-#raw_wig_id_end <- (raw_wig_id - 1) %>% .[-1] %>% c(., raw_wig %>% length)
-#raw_wig_names <- raw_wig %>%
-#    str_subset('fixedStep') %>%
-#    str_extract('chr[0-9, X, Y].?\\s') %>%
-#    str_replace(' ', '')
-#
-## Identify raw_wig chromosomes
-#raw_wig_chrs <- vector('list', length(raw_wig_id))
-#for (chr in 1:length(raw_wig_chrs)) {
-#    raw_wig_chrs[[chr]] <- raw_wig[(raw_wig_id[[chr]] + 1):raw_wig_id_end[[chr]]]
-#}
-#names(raw_wig_chrs) <- raw_wig_names
-#
-## Identify offsets, as readcounter is a few bins larger than indexcov
-#raw_wig_size <- raw_wig_chrs %>% lapply(length) %>% unlist
-#offset_size <- (raw_wig_size - ind_size) %>% enframe
-#write.table(offset_size, 'offset.txt', quote = F, row.names = F)
-#
+raw_wig <- read_lines('normal.wig')
+raw_wig_id <- raw_wig %>% startsWith('fixedStep') %>% which
+raw_wig_id_end <- (raw_wig_id - 1) %>% .[-1] %>% c(., raw_wig %>% length)
+raw_wig_names <- raw_wig %>%
+    str_subset('fixedStep') %>%
+    str_extract('chr[0-9, X, Y].?\\s') %>%
+    str_replace(' ', '')
+
+# Identify raw_wig chromosomes
+raw_wig_chrs <- vector('list', length(raw_wig_id))
+for (chr in 1:length(raw_wig_chrs)) {
+    raw_wig_chrs[[chr]] <- raw_wig[(raw_wig_id[[chr]] + 1):raw_wig_id_end[[chr]]]
+}
+names(raw_wig_chrs) <- raw_wig_names
+
+# Identify offsets, as readcounter is a few bins larger than indexcov
+raw_wig_size <- raw_wig_chrs %>% lapply(length) %>% unlist %>% enframe
+write.table(raw_wig_size, 'wig_sizes', quote = F, row.names = F)
+offset_size <- (raw_wig_size - ind_size) %>% enframe
+write.table(offset_size, 'offset.txt', quote = F, row.names = F)
+
 
 # ALIGNMENT CHECKING -----------------------------------------------------------
 #rctr_wig <- read_lines('normal.wig')

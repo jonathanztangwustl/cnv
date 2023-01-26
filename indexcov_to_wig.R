@@ -1,3 +1,5 @@
+# TODO: This file has been moved to the ichorCNA repo
+
 library('R.utils')
 library('tidyverse')
 library('magrittr')
@@ -136,4 +138,36 @@ index_to_wig <- function(file_path) {
     temp_wig <- tempfile(fileext = '.wig')
     write(wig, temp_wig)
     return(temp_wig)
+}
+
+batch_i2w <- function(in_dir, out_dir) {
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir, recursive = TRUE)
+    }
+
+    sample_list <- in_dir %>% list.dirs %>% str_subset('NWD') %>% str_extract('NWD[0-9]*')
+    sample_list <- sample_list %>% paste0('./', ., '/indexcov.tar.gz')
+
+    cluster <- makeForkCluster(detectCores() - 1)
+    samples <- clusterMap(
+        cluster,
+        index_to_wig,
+        sample_list
+    )
+    stopCluster(cluster)
+
+    sample_table <- samples %>% unlist %>% enframe
+    sample_table$sample <- sample_table$name %>% str_extract('NWD[0-9]*')
+    
+    calls <- paste0(
+        'cp ',
+        sample_table$value,
+        ' ',
+        out_dir,
+        '/',
+        sample_table$sample,
+        '.wig'
+    )
+
+    lapply(calls, system)
 }
