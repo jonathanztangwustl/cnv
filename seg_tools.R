@@ -177,8 +177,8 @@ get_segs <- function(set_data, meta_data, min_width = 3, alpha = 0.01, undo_sd =
 #       - set_segs: DNAcopy, filtered segmentation data with segments overlapping with gap
 #           regions more than 25% removed.
 REMOVE_GAPS <- TRUE
-GAPS_BED <- '/storage1/fs1/timley/Active/aml_ppg/tmp/jonathanztang/breakpoint_reader/terra/for_git/data/201_gaps.bed'
-GAPS <- read.table(GAPS_BED) %>% as_tibble
+GAPS_BED <- '/storage1/fs1/timley/Active/aml_ppg/tmp/jonathanztang/breakpoint_reader/terra/for_git/data/ichor_gaps.bed'
+GAPS <- read.table(GAPS_BED, header = TRUE) %>% as_tibble
 names(GAPS) <- c('chr', 'start', 'end')
 GAPS$start <- as.numeric(GAPS$start)
 GAPS$end <- as.numeric(GAPS$end)
